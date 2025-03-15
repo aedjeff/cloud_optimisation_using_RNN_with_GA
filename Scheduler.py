@@ -18,7 +18,7 @@ class Task:
         return f"Task({self.task_id}, Weight: {self.weight:.2f})"
 
 class TaskClassifier:
-    def __init__(self, epsilon=0.1):
+    def __init__(self, epsilon=0.75):
         self.classes = {1: [], 2: [], 3: []}
         self.epsilon = epsilon
 
@@ -50,6 +50,7 @@ def selection(population, fitness_function, queue):
     return sorted(population, key=lambda x: fitness_function(x, queue), reverse=True)[:len(population) // 2]
 
 def crossover(parent1, parent2):
+    if len(parent1) < 2: return
     point1, point2 = sorted(random.sample(range(len(parent1)), 2))
     child1 = parent1[:point1] + parent2[point1:point2] + parent1[point2:]
     child2 = parent2[:point1] + parent1[point1:point2] + parent2[point2:]
@@ -58,7 +59,10 @@ def crossover(parent1, parent2):
 def mutate(chromosome, mutation_rate=0.05):
     if random.random() < mutation_rate:
         gene_index = random.randint(0, len(chromosome) - 1)
-        chromosome[gene_index] = random.choice(chromosome)  # Randomly change the gene content
+        gene_index2 = random.randint(0, len(chromosome) - 1)
+        temp = chromosome[gene_index]
+        chromosome[gene_index] = chromosome[gene_index2]
+        chromosome[gene_index2] = temp  # Randomly change the gene content
     return chromosome
 
 def schedule_tasks(tasks, queue):
@@ -82,7 +86,7 @@ def schedule_tasks(tasks, queue):
 
 
 def main():
-    tasks = [Task(i, random.randint(1, 10), random.randint(1, 10), random.uniform(0.5, 1.5)) for i in range(10)]
+    tasks = [Task(i, random.randint(1, 10), random.randint(1, 10), random.uniform(0.5, 1.5)) for i in range(1000)]
     waiting_queue = []
     
     while tasks:
@@ -95,3 +99,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
